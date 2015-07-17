@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+
+$regs  = [ ];
+$files = [ ];
+
+$args = $argv;
+array_shift($args);
+
+$fileToggle = false;
+foreach( $args as $arg ) {
+	if( $arg == '--' ) {
+		$fileToggle = true;
+	} elseif( $fileToggle ) {
+		if( !is_readable($arg) ) {
+			fwrite(STDOUT, "error: failed to read file '{$arg}'.\n");
+			exit(2);
+		}
+
+		$files[] = $arg;
+	} else {
+		$regs[] = $arg;
+	}
+}
+
+$exit = 0;
+foreach( $files as $file ) {
+	$content = file_get_contents($file);
+	foreach( $regs as $reg ) {
+		if( preg_match($reg, $content) ) {
+			fwrite(STDOUT, "error: matched reg '{$reg}' in file '$file'.\n");
+			$exit = 1;
+		}
+	}
+}
+
+exit($exit);
