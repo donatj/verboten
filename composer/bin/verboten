@@ -23,6 +23,16 @@ foreach( $args as $arg ) {
 	}
 }
 
+if( !$regs ) {
+	fwrite(STDOUT, "error: no regular expressions to match against\n");
+	exit(2);
+}
+
+if( !$files ) {
+	fwrite(STDOUT, "error: no files to examine\n");
+	exit(2);
+}
+
 $exit = 0;
 foreach( $files as $file ) {
 	$content = file_get_contents($file);
