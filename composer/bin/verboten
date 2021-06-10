@@ -1,15 +1,15 @@
 #!/usr/bin/env php
 <?php
 
-$regs  = [ ];
-$files = [ ];
+$regs  = [];
+$files = [];
 
 $args = $argv;
 array_shift($args);
 
 $fileToggle = false;
 foreach( $args as $arg ) {
-	if( $arg == '--' ) {
+	if( $arg === '--' ) {
 		$fileToggle = true;
 	} elseif( $fileToggle ) {
 		if( !is_readable($arg) ) {
@@ -24,22 +24,37 @@ foreach( $args as $arg ) {
 }
 
 if( !$regs ) {
-	fwrite(STDOUT, "error: no regular expressions to match against\n");
+	fwrite(STDERR, "error: no regular expressions to match against\n");
 	exit(2);
 }
 
 if( !$files ) {
-	fwrite(STDOUT, "error: no files to examine\n");
+	fwrite(STDERR, "error: no files to examine\n");
 	exit(2);
 }
 
 $exit = 0;
 foreach( $files as $file ) {
+	$file = realpath($file);
+
 	$content = file_get_contents($file);
 	foreach( $regs as $reg ) {
-		if( preg_match($reg, $content) ) {
-			fwrite(STDOUT, "error: matched reg '{$reg}' in file '$file'.\n");
+		if( @preg_match_all($reg, $content, $matches, PREG_OFFSET_CAPTURE) ) {
 			$exit = 1;
+			foreach( $matches as $match ) {
+				$line = substr_count(substr($content, 0, $match[0][1]), "\n") + 1;
+				fwrite(STDOUT, "{$file}:{$line} error: matched regex " . var_export($reg, true) . " - len(" . strlen($match[0][0]) . ")\n");
+			}
+		}
+
+		if( preg_last_error() !== PREG_NO_ERROR ) {
+			$error = "invalid regex";
+			if( function_exists('preg_last_error_msg') ) {
+				$error = preg_last_error_msg();
+			}
+
+			fwrite(STDERR, "error: {$error}\n");
+			exit(2);
 		}
 	}
 }
