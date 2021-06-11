@@ -1,9 +1,9 @@
 # Verboten
 
-Simple CI Tool That Forbids Files Matching Regexes
+Simple CI Tool to forbid files from matching preg regexes.
 
 ## Example Usage
 
 ```bash
-php vendor/bin/verboten '/overflow.*?:\s*scroll/' -- `find ~<folder> -name '*.scss'`
+php vendor/bin/verboten '/overflow.*?:\s*scroll/' -- $(find ~<folder> -name '*.scss')
 ```
