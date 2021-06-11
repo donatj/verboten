@@ -1,6 +1,28 @@
 #!/usr/bin/env php
 <?php
 
+$autoloadLocations = [
+	getcwd() . '/vendor/autoload.php',
+	getcwd() . '/../../autoload.php',
+	__DIR__ . '/vendor/autoload.php',
+	__DIR__ . '/../vendor/autoload.php',
+	__DIR__ . '/../../../autoload.php',
+	__DIR__ . '/../../autoload.php',
+];
+
+$loaded = false;
+foreach( $autoloadLocations as $autoload ) {
+	if( is_file($autoload) ) {
+		require_once($autoload);
+		$loaded = true;
+	}
+}
+
+if( !$loaded ) {
+	fwrite(STDERR, "error: failed to locate autoloader\n");
+	exit(2);
+}
+
 $regs  = [];
 $files = [];
 
@@ -9,18 +31,22 @@ array_shift($args);
 
 $fileToggle = false;
 foreach( $args as $arg ) {
-	if( $arg === '--' ) {
-		$fileToggle = true;
-	} elseif( $fileToggle ) {
+	if( $fileToggle ) {
 		if( !is_readable($arg) ) {
-			fwrite(STDOUT, "error: failed to read file '{$arg}'.\n");
+			fwrite(STDERR, "error: failed to read file '{$arg}'.\n");
 			exit(2);
 		}
 
 		$files[] = $arg;
-	} else {
-		$regs[] = $arg;
+		continue;
 	}
+
+	if( $arg === '--' ) {
+		$fileToggle = true;
+		continue;
+	}
+
+	$regs[] = $arg;
 }
 
 if( !$regs ) {
@@ -43,7 +69,12 @@ foreach( $files as $file ) {
 			$exit = 1;
 			foreach( $matches as $match ) {
 				$line = substr_count(substr($content, 0, $match[0][1]), "\n") + 1;
-				fwrite(STDOUT, "{$file}:{$line} error: matched regex " . var_export($reg, true) . " - len(" . strlen($match[0][0]) . ")\n");
+				fwrite(STDOUT, sprintf("%s:%d error: matched regex %s(%d)\n",
+					$file,
+					$line,
+					var_export($reg, true),
+					strlen($match[0][0])
+				));
 			}
 		}
 
@@ -53,7 +84,7 @@ foreach( $files as $file ) {
 				$error = preg_last_error_msg();
 			}
 
-			fwrite(STDERR, "error: {$error}\n");
+			fwrite(STDERR, "regex error: {$error}\n");
 			exit(2);
 		}
 	}

@@ -7,6 +7,10 @@
 			"email": "donatj@gmail.com"
 		}
 	],
+	"require": {
+		"php": ">=5.4",
+		"symfony/polyfill-php80": "^1.23"
+	},
 	"bin": [
 		"composer/bin/verboten"
 	]
