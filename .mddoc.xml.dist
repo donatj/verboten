@@ -1,0 +1,23 @@
+<mddoc>
+	<docpage target="README.md">
+		<section title="Verboten">
+			<badge-poser type="version"/>
+			<badge-poser type="license"/>
+
+			<text>Simple CI Tool That Forbids Files Matching Regexes</text>
+			<section title="Requirements">
+				<composer-requires/>
+			</section>
+			<section title="Installing">
+				<composer-install dev="true"/>
+			</section>
+			<section title="Usage">
+				<text><![CDATA[
+```bash
+php vendor/bin/verboten '/overflow.*?:\s*scroll/' -- `find ~<folder> -name '*.scss'`
+```
+]]></text>
+			</section>
+		</section>
+	</docpage>
+</mddoc>
