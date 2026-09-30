@@ -1,27 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-$autoloadLocations = [
-	getcwd() . '/vendor/autoload.php',
-	getcwd() . '/../../autoload.php',
-	__DIR__ . '/vendor/autoload.php',
-	__DIR__ . '/../vendor/autoload.php',
-	__DIR__ . '/../../../autoload.php',
-	__DIR__ . '/../../autoload.php',
-];
-
-$loaded = false;
-foreach( $autoloadLocations as $autoload ) {
-	if( is_file($autoload) ) {
-		require_once($autoload);
-		$loaded = true;
-	}
-}
-
-if( !$loaded ) {
-	fwrite(STDERR, "error: failed to locate autoloader\n");
-	exit(2);
-}
+require_once isset($_composer_autoload_path)
+	? $_composer_autoload_path
+	: __DIR__ . '/../../vendor/autoload.php';
 
 $regs  = [];
 $files = [];
