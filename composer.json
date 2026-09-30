@@ -8,6 +8,7 @@
 		}
 	],
 	"require": {
+		"composer-runtime-api": "^2.2",
 		"php": ">=5.4",
 		"symfony/polyfill-php80": "^1.23"
 	},
